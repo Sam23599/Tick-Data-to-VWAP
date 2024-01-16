@@ -1,7 +1,6 @@
 # NASDAQ-ITCH5-Volume-Weighted-Average-Price-TICKS
 Parses NASDAQ ITCH 5 data and Calculates Volume Weighted average Price of all the Stock at every hour including market close. 
 
-Just provide the path of the NASDAQ ITCH 5.0 format file to FileInputStream("file-path\\file-name");
 
 
 # NASDAQ ITCH 5 Data 
