@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "danfojs-node": "^1.1.2",
+    "python-struct": "^1.1.3"
+  },
+  "name": "tick-data-to-vwap",
+  "version": "1.0.0",
+  "description": "efficient program that parses trades from a NASDAQ ITCH 5.0 tick data file and outputs a running volume-weighted average price",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tick-data",
+    "VWAP"
+  ],
+  "author": "Satyam Singh Virat",
+  "license": "ISC"
+}
