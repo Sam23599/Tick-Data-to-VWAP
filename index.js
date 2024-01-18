@@ -30,161 +30,158 @@ binData.on('readable', async () => {
                 break;
 
             case 'R':
+                // Handle message of type R
                 message = binData.read(38);
                 bin_msg = await itch_fun.stock_directory(message);
                 // console.log(bin_msg);
-                // Handle message of type R
                 break;
 
             case 'H':
+                // Handle message of type H
                 message = binData.read(24);
                 bin_msg = await itch_fun.stock_trading_action(message);
-                console.log(bin_msg);
-                // Handle message of type H
+                // console.log(bin_msg);
                 break;
 
             case 'Y':
+                // Handle message of type Y
                 message = binData.read(19);
                 bin_msg = await itch_fun.short_sale_price_test(message);
-                console.log(bin_msg);
-                // Handle message of type Y
+                // console.log(bin_msg);
                 break;
 
             case 'L':
+                // Handle message of type L
                 message = binData.read(25);
                 bin_msg = await itch_fun.market_participation_position(message);
-                console.log(bin_msg);
-                // Handle message of type L
+                // console.log(bin_msg);
                 break;
 
             case 'V':
+                // Handle message of type V
                 message = binData.read(34);
                 bin_msg = await itch_fun.mwcb_decline_level_message(message);
-                console.log(bin_msg);
-                // Handle message of type V
+                // console.log(bin_msg);
                 break;
 
             case 'W':
+                // Handle message of type W
                 message = binData.read(11);
                 bin_msg = await itch_fun.mwcb_status_message(message);
-                console.log(bin_msg);
-                // Handle message of type W
+                // console.log(bin_msg);
                 break;
 
             case 'K':
+                // Handle message of type K
                 message = binData.read(27);
                 bin_msg = await itch_fun.ipo_quoting_period_update(message);
-                console.log(bin_msg);
-                // Handle message of type K
+                // console.log(bin_msg);
                 break;
 
             case 'J':
+                // Handle message of type J
                 message = binData.read(34);
                 bin_msg = await itch_fun.LULD_Auction_Collar(message);
-                console.log(bin_msg);
-                // Handle message of type J
+                // console.log(bin_msg);
                 break;
 
             case 'h':
+                // Handle message of type h 
                 message = binData.read(20);
                 bin_msg = await itch_fun.Operational_Halt(message);
-                console.log(bin_msg);
-                // Handle message of type h 
+                // console.log(bin_msg);
                 break;
 
             case 'A':
+                // Handle message of type A
                 message = binData.read(35);
                 bin_msg = await itch_fun.add_order_message(message);
-                console.log(bin_msg);
-                // Handle message of type A
+                // console.log(bin_msg);
                 break;
 
             case 'F':
+                // Handle message of type F
                 message = binData.read(39);
                 bin_msg = await itch_fun.add_order_with_mpid(message);
-                console.log(bin_msg);
-                // Handle message of type F
+                // console.log(bin_msg);
                 break;
 
             case 'E':
+                // Handle message of type E
                 message = binData.read(30);
                 bin_msg = await itch_fun.order_executed_message(message);
-                console.log(bin_msg);
-                // Handle message of type E
+                // console.log(bin_msg);
                 break;
 
             case 'C':
+                // Handle message of type C
                 message = binData.read(35);
                 bin_msg = await itch_fun.order_executed_price_message(message);
-                console.log(bin_msg);
-                // Handle message of type C
+                // console.log(bin_msg);
                 break;
 
             case 'X':
+                // Handle message of type X
                 message = binData.read(22);
                 bin_msg = await itch_fun.order_cancel_message(message);
-                console.log(bin_msg);
-                // Handle message of type X
+                // console.log(bin_msg);
                 break;
 
             case 'D':
+                // Handle message of type D
                 message = binData.read(18);
                 bin_msg = await itch_fun.order_delete_message(message);
-                console.log(bin_msg);
-                // Handle message of type D
+                // console.log(bin_msg);
                 break;
 
             case 'U':
+                // Handle message of type U
                 message = binData.read(34);
                 bin_msg = await itch_fun.order_replace_message(message);
-                console.log(bin_msg);
-                // Handle message of type U
+                // console.log(bin_msg);
                 break;
 
             case 'P':
+                // Handle message of type P
                 message = binData.read(43);
                 bin_msg = await itch_fun.trade_message(message);
                 console.log(message)
                 console.log(bin_msg);
-
-                support_funs.getVWAP(message);
-                exit;
-                // Handle message of type P
                 break;
 
             case 'Q':
+                // Handle message of type Q
                 message = binData.read(39);
                 bin_msg = await itch_fun.cross_trade_message(message);
-                console.log(bin_msg);
-                // Handle message of type Q
+                // console.log(bin_msg);
                 break;
 
             case 'B':
+                // Handle message of type B
                 message = binData.read(18);
                 bin_msg = await itch_fun.broken_trade_execution_message(message);
-                console.log(bin_msg);
-                // Handle message of type B
+                // console.log(bin_msg);
                 break;
 
             case 'I':
+                // Handle message of type I
                 message = binData.read(49);
                 bin_msg = await itch_fun.net_order_imbalance_message(message);
-                console.log(bin_msg);
-                // Handle message of type I
+                // console.log(bin_msg);
                 break;
 
             case 'N':
+                // Handle message of type N
                 message = binData.read(19);
                 bin_msg = await itch_fun.retail_price_improvement(message);
-                console.log(bin_msg);
-                // Handle message of type N
+                // console.log(bin_msg);
                 break;
 
             case 'O':
+                // Handle message of type O
                 message = binData.read(47);
                 bin_msg = await itch_fun.capital_raise_price_discovery(message);
-                console.log(bin_msg);
-                // Handle message of type O
+                // console.log(bin_msg);
                 break;
 
             default:
@@ -193,6 +190,7 @@ binData.on('readable', async () => {
         }
     }
 });
+
 
 binData.on('end', () => {
     console.log('Processing complete.');

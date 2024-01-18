@@ -14,16 +14,49 @@ if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath);
 }
 
+const processResult = (resulted_val) => {
+    // Handled the timestamp
+    const time_stamp = resulted_val[2];
+    resulted_val[2] = support_funs.convertTime(time_stamp);
+
+    // Handled the LongFields
+    resulted_val = support_funs.handleLongFields(resulted_val);
+
+    return resulted_val;
+}
 
 const support_funs = {
-    
-    convertTime(stamp) {
-        const binaryArray = new TextEncoder().encode(stamp);
-        const nanoseconds = BigInt('0x' + Array.from(binaryArray).map(byte => byte.toString(16).padStart(2, '0')).join(''));
+
+    convertTime(time_stamp) {
+        if (!time_stamp) {
+            return '00:00:00';
+        }
+        const binaryArray = new TextEncoder().encode(time_stamp);
+        // const nanoseconds = BigInt('0x' + Array.from(binaryArray).map(byte => byte.toString(16).padStart(2, '0')).join(''));
+        const nanoseconds = BigInt(parseInt(Array.from(binaryArray).map(byte => byte.toString(2).padStart(8, '0')).join(''), 2));
+
         const seconds = Number(nanoseconds) / 1e9;
-        const date = Date(seconds * 1000);
-        const formattedTime = date.toString().substring(16,8);
+        const date = new Date(seconds * 1000);
+        const formattedTime = date.toString().substring(16, 24);
         return formattedTime;
+    },
+
+    handleLongFields(resultArray) {
+        // Function to convert Long {} to decimal
+        const convertLongToDecimal = (longObject) => {
+            return longObject.low + longObject.high * 2 ** 32;
+        };
+
+        let val = [...resultArray];
+
+        // Find and convert Long {} fields in val
+        for (let i = 0; i < val.length; i++) {
+            if (typeof val[i] === 'object' && val[i].hasOwnProperty('low') && val[i].hasOwnProperty('high') && val[i].hasOwnProperty('unsigned')) {
+                val[i] = convertLongToDecimal(val[i]);
+            }
+        }
+
+        return val;
     },
 
     calVWAP(df) {
@@ -52,7 +85,7 @@ const support_funs = {
 
         if (!tradeMessageResult || !Array.isArray(tradeMessageResult.parsedData)) {
             console.error('Error in tradeMessage. Check its implementation.');
-            return; 
+            return;
         }
 
         const { parsedData, hour } = tradeMessageResult;
@@ -108,9 +141,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sc', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 5) {
+        val = processResult(val);
+        if (val.length === 4) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -126,8 +160,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8sccIcc2scccccIc', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 17) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -144,8 +179,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8scc4s', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 7) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -162,8 +198,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8sc', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 5) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -180,8 +217,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s4s8sccc', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 8) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -198,9 +236,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQQQ', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 7) {
+        val = processResult(val);
+        if (val.length === 6) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -216,9 +255,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sc', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 5) {
+        val = processResult(val);
+        if (val.length === 4) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -234,9 +274,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8sIcL', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 8) {
+        val = processResult(val);
+        if (val.length === 7) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -252,8 +293,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8sLLLI', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 8) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -270,9 +312,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8scc', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 7) {
+        val = processResult(val);
+        if (val.length === 6) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -288,7 +331,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQcI8sL', msg);
-        const val = [...result];
+        let val = [...result];
+
+        val = processResult(val);
+        val = processResult(val);
 
         if (val.length === 8) {
             // console.log("Stock Directory Message:", val);
@@ -306,9 +352,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQcI8sL4s', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 10) {
+        val = processResult(val);
+        if (val.length === 9) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -324,9 +371,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQIQ', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 7) {
+        val = processResult(val);
+        if (val.length === 6) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -342,9 +390,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQIQcL', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 9) {
+        val = processResult(val);
+        if (val.length === 8) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -360,9 +409,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQI', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 6) {
+        val = processResult(val);
+        if (val.length === 5) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -378,9 +428,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQ', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 5) {
+        val = processResult(val);
+        if (val.length === 4) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -396,9 +447,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQQIL', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 8) {
+        val = processResult(val);
+        if (val.length === 7) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -414,7 +466,16 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQcI8sLQ', msg);
-        const val = [...result];
+        let val = [...result];
+
+        val = processResult(val);
+
+        // remove padded spaces from stock's name
+        val[6] = val[6].trim();
+
+        // convertedto a decimalformat for precision according to manual
+        val[7] = float(val[7]);
+        val[7] = val[7] / 10000;
 
         if (val.length === 9) {
             // console.log("Stock Directory Message:", val);
@@ -432,8 +493,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQ8sLQc', msg);
-        const val = [...result];
+        let val = [...result];
 
+        val = processResult(val);
         if (val.length === 8) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -450,9 +512,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQ', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 5) {
+        val = processResult(val);
+        if (val.length === 4) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -468,9 +531,10 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6sQQc8sLLLcc', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 13) {
+        val = processResult(val);
+        if (val.length === 12) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {
@@ -486,10 +550,9 @@ const itch_fun = {
         }
 
         const result = struct.unpack('!HH6s8sc', msg);
-        const val = [...result];
+        let val = [...result];
 
-        console.log('N len: ', val.length);
-
+        val = processResult(val);
         if (val.length === 5) {
             // console.log("Stock Directory Message:", val);
             return val;
@@ -499,16 +562,17 @@ const itch_fun = {
         }
     },
 
-    // Handle message of type R
+    // Handle message of type O
     capital_raise_price_discovery: async (msg) => {
         if (msg == null) {
             return [];
         }
 
         const result = struct.unpack('!HH6s8scLLL8sLL', msg);
-        const val = [...result];
+        let val = [...result];
 
-        if (val.length === 12) {
+        val = processResult(val);
+        if (val.length === 11) {
             // console.log("Stock Directory Message:", val);
             return val;
         } else {

@@ -1,0 +1,6 @@
+add cal_vwap feature properly
+slice all event arrays for just 3 value- timestamp[3], order_ref_no[4]= stock_name, vwap for the stock(add new field);
+
+
+also-
+fix cal_vwap, getwap functions
