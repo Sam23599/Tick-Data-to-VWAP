@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const struct = require('python-struct');
 
+
 let current_VWAP = {};
 const VWAP_funcs = {
     getCurrentVWAP() {
@@ -40,6 +41,7 @@ const processResult = (resulted_val) => {
 
     return resulted_val;
 }
+
 
 const support_funs = {
 
@@ -104,6 +106,7 @@ const support_funs = {
     }
 
 }
+
 
 const itch_fun = {
 
