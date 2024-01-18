@@ -464,19 +464,23 @@ const itch_fun = {
         if (msg == null) {
             return [];
         }
-
+        
         const result = struct.unpack('!HH6sQcI8sLQ', msg);
         let val = [...result];
+        console.log('res val: ', val);
 
+        // console.log(val);
         val = processResult(val);
 
         // remove padded spaces from stock's name
         val[6] = val[6].trim();
 
-        // convertedto a decimalformat for precision according to manual
-        val[7] = float(val[7]);
+        // converted for precision according to given-manual
         val[7] = val[7] / 10000;
 
+        // timestamp, shares, stock-name, price
+        let final_result = [val[2], val[5], val[6], val[7]];
+        console.log(final_result);
         if (val.length === 9) {
             // console.log("Stock Directory Message:", val);
             return val;

@@ -145,8 +145,7 @@ binData.on('readable', async () => {
                 // Handle message of type P
                 message = binData.read(43);
                 bin_msg = await itch_fun.trade_message(message);
-                console.log(message)
-                console.log(bin_msg);
+                console.log('binary msg: ',bin_msg);
                 break;
 
             case 'Q':
