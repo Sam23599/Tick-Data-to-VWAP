@@ -1,13 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const dfd = require('danfojs-node');
-const struct = require('python-struct');
-const { itch_fun, getCurrentVWAP } = require('./itch_funs');
-const { exit } = require('process');
+const { itch_fun, VWAP_funcs } = require('./itch_funs');
 
 
 var i = 0;
+
 // Replace with the path to your data file
 const filePath = path.join(__dirname, 'tick-data-file', '01302019.NASDAQ_ITCH50.gz');
 
@@ -19,12 +17,10 @@ binData.on('readable', async () => {
     while ((msgHeader = binData.read(1)) !== null) {
         let message;
         let bin_msg;
-        console.log('header ', msgHeader.toString());
 
-        // Read just the trade-messages with event of Message-Type='P'
+        // Read just the trade-messages with Message-Type='P'
         switch (msgHeader.toString()) {
             case 'P':
-                // Handle message of type P
                 message = binData.read(43);
                 bin_msg = await itch_fun.trade_message(message);
                 i++;
@@ -35,7 +31,7 @@ binData.on('readable', async () => {
         }
 
 
-        // NOTE: Incase  if you to go-through the whole document with every event details
+        // NOTE: Incase  if you want to go-through the whole document with every event details then comment earlier switch case and uncomment this one
         /*
         switch (msgHeader.toString()) {
             case 'S':
@@ -205,12 +201,12 @@ binData.on('readable', async () => {
         }
         */
 
-        if (i > 4) {
+        if (i > 10) {
             break;
         }
     }
-    console.log('final result :', getCurrentVWAP());
 
+    VWAP_funcs.createVWAPFiles(VWAP_funcs.getCurrentVWAP());
 });
 
 

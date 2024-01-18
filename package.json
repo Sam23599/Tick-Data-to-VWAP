@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "danfojs-node": "^1.1.2",
     "python-struct": "^1.1.3"
   },
   "name": "tick-data-to-vwap",

@@ -1,16 +1,34 @@
 const fs = require('fs');
 const path = require('path');
-const dfd = require('danfojs-node');
 const struct = require('python-struct');
 
 let current_VWAP = {};
-const getCurrentVWAP = () => current_VWAP;
+const VWAP_funcs = {
+    getCurrentVWAP() {
+        return current_VWAP
+    },
 
-// Creating the 'output' directory if it doesn't exist
-const outputPath = path.join('.', 'output');
-if (!fs.existsSync(outputPath)) {
-    fs.mkdirSync(outputPath);
+    createVWAPFiles(current_VWAP) {
+        const uploadFolderPath = './output/';
+        fs.mkdirSync(uploadFolderPath, { recursive: true });  // Ensure the folder exists
+
+        Object.keys(current_VWAP).forEach((key) => {
+            if (key.match(/_\d{2}$/)) {
+                const hour = key.split('_')[1];
+                const fileName = path.join(uploadFolderPath, `vwap_${hour}.csv`);
+    
+                const data = current_VWAP[key];
+                const vwap = current_VWAP[`${data.stock}_VWAP`];
+    
+                // Use 'a' flag to append to the file if it exists
+                const csvContent = `time,stock name,stock vwap\n${data.timestamp},${data.stock},${vwap}\n`;
+                fs.writeFileSync(fileName, csvContent, { flag: 'a' });
+            }
+        });
+    }
+
 }
+
 
 const processResult = (resulted_val) => {
     // Handled the timestamp
@@ -515,4 +533,4 @@ const itch_fun = {
     }
 }
 
-module.exports = { itch_fun, getCurrentVWAP };
+module.exports = { itch_fun, VWAP_funcs };
