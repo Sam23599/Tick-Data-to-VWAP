@@ -16,9 +16,13 @@ if (!fs.existsSync(outputPath)) {
 
 
 const support_funs = {
+    
     convertTime(stamp) {
-        const time = new Date(stamp / 1e6);
-        const formattedTime = time.toISOString().substr(11, 8);
+        const binaryArray = new TextEncoder().encode(stamp);
+        const nanoseconds = BigInt('0x' + Array.from(binaryArray).map(byte => byte.toString(16).padStart(2, '0')).join(''));
+        const seconds = Number(nanoseconds) / 1e9;
+        const date = Date(seconds * 1000);
+        const formattedTime = date.toString().substring(16,8);
         return formattedTime;
     },
 
@@ -43,7 +47,15 @@ const support_funs = {
 
     getVWAP(message) {
         console.log('message: ', message)
-        const { parsedData, hour } = this.tradeMessage(message);
+        // const { parsedData, hour } = this.tradeMessage(message);
+        const tradeMessageResult = this.tradeMessage(message);
+
+        if (!tradeMessageResult || !Array.isArray(tradeMessageResult.parsedData)) {
+            console.error('Error in tradeMessage. Check its implementation.');
+            return; 
+        }
+
+        const { parsedData, hour } = tradeMessageResult;
 
         if (this.flag === null) {
             this.flag = hour;
@@ -88,108 +100,421 @@ const support_funs = {
 }
 
 const itch_fun = {
-    system_event_message: async () => {
 
-    },
+    // Handle message of type S
+    system_event_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
-    stock_directory: async (msg) => {
-        // Stock directory message processing
-        const result = struct.unpack('!HH6s8sccIcc2scccccIc', Buffer.from(msg, 'hex'));
+        const result = struct.unpack('!HH6sc', msg);
         const val = [...result];
 
-        // Implement the rest of your stock_directory function using the 'val' variable
-        // For example:
-        if (val.length === 38) {
-            console.log("Stock Directory Message:", val);
-            // Further processing or return as needed
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
         } else {
             console.log("Invalid Stock Directory Message");
-            // Handle invalid message case
+            return [];
         }
     },
 
-    stock_trading_action: async () => {
+    // Handle message of type R
+    stock_directory: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8sccIcc2scccccIc', msg);
+        const val = [...result];
+
+        if (val.length === 17) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    short_sale_price_test: async () => {
+    // Handle message of type H
+    stock_trading_action: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8scc4s', msg);
+        const val = [...result];
+
+        if (val.length === 7) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    market_participation_position: async () => {
+    // Handle message of type Y
+    short_sale_price_test: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8sc', msg);
+        const val = [...result];
+
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    mwcb_decline_level_message: async () => {
+    // Handle message of type L
+    market_participation_position: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s4s8sccc', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    mwcb_status_message: async () => {
+    // Handle message of type V
+    mwcb_decline_level_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQQQ', msg);
+        const val = [...result];
+
+        if (val.length === 7) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    ipo_quoting_period_update: async () => {
+    // Handle message of type W
+    mwcb_status_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sc', msg);
+        const val = [...result];
+
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    LULD_Auction_Collar: async () => {
+    // Handle message of type K
+    ipo_quoting_period_update: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8sIcL', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    Operational_Halt: async () => {
+    // Handle message of type J
+    LULD_Auction_Collar: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8sLLLI', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    add_order_message: async () => {
+    // Handle message of type h
+    Operational_Halt: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8scc', msg);
+        const val = [...result];
+
+        if (val.length === 7) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    add_order_with_mpid: async () => {
+    // Handle message of type A
+    add_order_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQcI8sL', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    order_executed_message: async () => {
+    // Handle message of type F
+    add_order_with_mpid: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQcI8sL4s', msg);
+        const val = [...result];
+
+        if (val.length === 10) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    order_executed_price_message: async () => {
+    // Handle message of type E
+    order_executed_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQIQ', msg);
+        const val = [...result];
+
+        if (val.length === 7) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    order_cancel_message: async () => {
+    // Handle message of type C
+    order_executed_price_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQIQcL', msg);
+        const val = [...result];
+
+        if (val.length === 9) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    order_delete_message: async () => {
+    // Handle message of type X
+    order_cancel_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQI', msg);
+        const val = [...result];
+
+        if (val.length === 6) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    order_replace_message: async () => {
+    // Handle message of type D
+    order_delete_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQ', msg);
+        const val = [...result];
+
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    trade_message: async () => {
+    // Handle message of type U
+    order_replace_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQQIL', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    cross_trade_message: async () => {
+    // Handle message of type P
+    trade_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQcI8sLQ', msg);
+        const val = [...result];
+
+        if (val.length === 9) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    broken_trade_execution_message: async () => {
+    // Handle message of type Q
+    cross_trade_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQ8sLQc', msg);
+        const val = [...result];
+
+        if (val.length === 8) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    net_order_imbalance_message: async () => {
+    // Handle message of type B
+    broken_trade_execution_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQ', msg);
+        const val = [...result];
+
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    retail_price_improvement: async () => {
+    // Handle message of type I
+    net_order_imbalance_message: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6sQQc8sLLLcc', msg);
+        const val = [...result];
+
+        if (val.length === 13) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     },
 
-    capital_raise_price_discovery: async () => {
+    // Handle message of type N
+    retail_price_improvement: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
 
+        const result = struct.unpack('!HH6s8sc', msg);
+        const val = [...result];
+
+        console.log('N len: ', val.length);
+
+        if (val.length === 5) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
+    },
+
+    // Handle message of type R
+    capital_raise_price_discovery: async (msg) => {
+        if (msg == null) {
+            return [];
+        }
+
+        const result = struct.unpack('!HH6s8scLLL8sLL', msg);
+        const val = [...result];
+
+        if (val.length === 12) {
+            // console.log("Stock Directory Message:", val);
+            return val;
+        } else {
+            console.log("Invalid Stock Directory Message");
+            return [];
+        }
     }
 }
 
