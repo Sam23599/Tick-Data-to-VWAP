@@ -3,11 +3,11 @@ const path = require('path');
 const zlib = require('zlib');
 const dfd = require('danfojs-node');
 const struct = require('python-struct');
-const {itch_fun, support_funs} = require('./itch_funs');
+const { itch_fun, getCurrentVWAP } = require('./itch_funs');
 const { exit } = require('process');
 
 
-
+var i = 0;
 // Replace with the path to your data file
 const filePath = path.join(__dirname, 'tick-data-file', '01302019.NASDAQ_ITCH50.gz');
 
@@ -21,6 +21,22 @@ binData.on('readable', async () => {
         let bin_msg;
         console.log('header ', msgHeader.toString());
 
+        // Read just the trade-messages with event of Message-Type='P'
+        switch (msgHeader.toString()) {
+            case 'P':
+                // Handle message of type P
+                message = binData.read(43);
+                bin_msg = await itch_fun.trade_message(message);
+                i++;
+                break;
+            default:
+                // console.error('Unknown message header:', msgHeader);
+                break;
+        }
+
+
+        // NOTE: Incase  if you to go-through the whole document with every event details
+        /*
         switch (msgHeader.toString()) {
             case 'S':
                 // Handle message of type S
@@ -145,7 +161,7 @@ binData.on('readable', async () => {
                 // Handle message of type P
                 message = binData.read(43);
                 bin_msg = await itch_fun.trade_message(message);
-                console.log('binary msg: ',bin_msg);
+                // console.log(bin_msg);
                 break;
 
             case 'Q':
@@ -187,7 +203,14 @@ binData.on('readable', async () => {
                 // console.error('Unknown message header:', msgHeader);
                 break;
         }
+        */
+
+        if (i > 4) {
+            break;
+        }
     }
+    console.log('final result :', getCurrentVWAP());
+
 });
 
 
