@@ -4,7 +4,7 @@ const zlib = require('zlib');
 const { itch_fun, VWAP_funcs } = require('./itch_funs');
 
 
-var i = 0;
+var sample_run = 0;
 
 // Replace with the path to your data file
 const filePath = path.join(__dirname, 'tick-data-file', '01302019.NASDAQ_ITCH50.gz');
@@ -15,6 +15,7 @@ const binData = fs.createReadStream(filePath).pipe(zlib.createGunzip());
 binData.on('readable', async () => {
     let msgHeader;
     while ((msgHeader = binData.read(1)) !== null) {
+        
         let message;
         let bin_msg;
 
@@ -23,7 +24,7 @@ binData.on('readable', async () => {
             case 'P':
                 message = binData.read(43);
                 bin_msg = await itch_fun.trade_message(message);
-                i++;
+                sample_run++;
                 break;
             default:
                 // console.error('Unknown message header:', msgHeader);
@@ -32,6 +33,7 @@ binData.on('readable', async () => {
 
 
         // NOTE: Incase  if you want to go-through the whole document with every event details then comment earlier switch case and uncomment this one
+        
         /*
         switch (msgHeader.toString()) {
             case 'S':
@@ -201,7 +203,7 @@ binData.on('readable', async () => {
         }
         */
 
-        if (i > 10) {
+        if (sample_run > 30) {
             break;
         }
     }

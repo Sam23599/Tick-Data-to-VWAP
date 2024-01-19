@@ -4,6 +4,7 @@ const struct = require('python-struct');
 
 
 let current_VWAP = {};
+
 const VWAP_funcs = {
     getCurrentVWAP() {
         return current_VWAP
@@ -21,13 +22,18 @@ const VWAP_funcs = {
                 const data = current_VWAP[key];
                 const vwap = current_VWAP[`${data.stock}_VWAP`];
     
-                // Use 'a' flag to append to the file if it exists
-                const csvContent = `time,stock name,stock vwap\n${data.timestamp},${data.stock},${vwap}\n`;
+                const csvContent = `${data.timestamp},${data.stock},${vwap}\n`;
+    
+                const fileExists = fs.existsSync(fileName);    
+                if (!fileExists) {
+                    fs.writeFileSync(fileName, 'time,stock name,stock vwap\n', { flag: 'a' });
+                }
+    
+                // Append the data to the file
                 fs.writeFileSync(fileName, csvContent, { flag: 'a' });
             }
         });
     }
-
 }
 
 
@@ -104,7 +110,6 @@ const support_funs = {
             [`${stock}_VWAP`]: vwap.toFixed(4),
         };
     }
-
 }
 
 
@@ -424,20 +429,21 @@ const itch_fun = {
             return [];
         }
 
-        const result = struct.unpack('!HH6sQcI8sLQ', msg);
-        let val = [...result];
+        // const result = struct.unpack('!HH6sQcI8sLQ', msg);
+        const result = struct.unpack('>cHHQIcI8sIQ', msg);
 
+        let val = [...result];
         val = processResult(val);
 
         // remove padded spaces from stock's name
-        val[6] = val[6].replace(/\s/g, '').trim();
+        val[7] = val[7].replace(/\s/g, '').trim();
 
         // converted for price precision as per given-manual
-        val[7] = val[7] / 10000;
+        val[8] = val[8] / 10000;
 
-        current_VWAP = support_funs.calculateVWAP(current_VWAP, val[2], val[6], val[5], val[7]);
+        current_VWAP = support_funs.calculateVWAP(current_VWAP, val[2], val[7], val[6], val[8]);
 
-        if (val.length === 9) {
+        if (val.length === 10) {
             return val;
         } else {
             console.log("Invalid Stock Directory Message");

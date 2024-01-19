@@ -29,7 +29,7 @@ The Volume Weighted Average Price (VWAP) is calculated based on the ITCH ticks d
 2. Clone this repository to your local machine.
 
    ```bash
-   git clone https://github.com/your-username/your-repository.git
+   git clone https://github.com/Sam23599/Tick-Data-to-VWAP
 
 3. Navigate to the project directory.
 
@@ -55,7 +55,8 @@ This will create CSV files in the ./output/ folder, each containing VWAP data fo
 ## File Structure
 
 - index.js: Main script for parsing NASDAQ ITCH 5.0 data and calculating VWAP.
-- ./output/: Folder containing the generated CSV files.
+- /output/: Folder containing the generated CSV files.
+- /tick-data-dile/ : Folder should contain the ITCH-data file.
 
 ## Configuration
 Adjust the following variables in index.js as needed:
@@ -64,7 +65,3 @@ Adjust the following variables in index.js as needed:
 This project is licensed under the MIT License.
 
 Feel free to modify this README.md to better suit your project's details and structure. If you have any questions or need further assistance, don't hesitate to reach out.
-
-    ```csharp
-    Replace "your-username" and "your-repository" with your actual GitHub username and repository name. Adjust the instructions and details based on your specific project requirements.
-    ```
